@@ -23,8 +23,8 @@ import javafx.beans.value.ChangeListener;
  * <p>Pour vous concentrer sur le mécanisme d'observation, le scénario d'affichage est entièrement
  * fourni. Votre travail se limite à <b>ajouter et retirer les listeners</b> aux endroits indiqués.
  *
- * @see <a
- *     href="https://openjfx.io/javadoc/25/javafx.base/javafx/beans/property/IntegerProperty.html">IntegerProperty</a>
+ * @see <a href=
+ *     "https://openjfx.io/javadoc/25/javafx.base/javafx/beans/property/IntegerProperty.html">IntegerProperty</a>
  */
 public class ProprieteSimple {
 
@@ -75,8 +75,12 @@ public class ProprieteSimple {
     // TODO exercice 1 (3 lignes à écrire) :
     // 1. Afficher "Add invalidation listener."
     // 2. Créer un InvalidationListener qui affiche "The observable has been
-    //    invalidated." et le stocker dans this.invalidationListener.
+    // invalidated." et le stocker dans this.invalidationListener.
     // 3. L'abonner à anIntProperty via addListener(invalidationListener).
+    System.out.println("Add invalidation listener.");
+    this.invalidationListener =
+        observable -> System.out.println("The observable has been invalidated.");
+    anIntProperty.addListener(invalidationListener);
 
     System.out.println("setValue() with 1024.");
     anIntProperty.setValue(1024);
@@ -89,7 +93,10 @@ public class ProprieteSimple {
 
     // TODO exercice 1 (2 lignes à écrire) :
     // 1. Afficher "Remove invalidation listener."
-    // 2. Retirer le listener via anIntProperty.removeListener(invalidationListener).
+    // 2. Retirer le listener via
+    // anIntProperty.removeListener(invalidationListener).
+    System.out.println("Remove invalidation listener.");
+    anIntProperty.removeListener(invalidationListener);
 
     System.out.println("set() with 1024.");
     anIntProperty.set(1024);
@@ -120,9 +127,18 @@ public class ProprieteSimple {
     // TODO exercice 1 (3 lignes à écrire) :
     // 1. Afficher "Add change listener."
     // 2. Créer un ChangeListener<Number> qui affiche
-    //    "The observableValue has changed: oldValue = X, newValue = Y" et le
-    //    stocker dans this.changeListener.
+    // "The observableValue has changed: oldValue = X, newValue = Y" et le
+    // stocker dans this.changeListener.
     // 3. L'abonner à anIntProperty via addListener(changeListener).
+    System.out.println("Add change listener.");
+    this.changeListener =
+        (observable, oldValue, newValue) ->
+            System.out.println(
+                "The observableValue has changed: oldValue = "
+                    + oldValue
+                    + ", newValue = "
+                    + newValue);
+    anIntProperty.addListener(changeListener);
 
     System.out.println("setValue() with 1024.");
     anIntProperty.setValue(1024);
@@ -136,6 +152,8 @@ public class ProprieteSimple {
     // TODO exercice 1 (2 lignes à écrire) :
     // 1. Afficher "Remove change listener."
     // 2. Retirer le listener via anIntProperty.removeListener(changeListener).
+    System.out.println("Remove change listener.");
+    anIntProperty.removeListener(changeListener);
 
     System.out.println("set() with 1024.");
     anIntProperty.set(1024);
