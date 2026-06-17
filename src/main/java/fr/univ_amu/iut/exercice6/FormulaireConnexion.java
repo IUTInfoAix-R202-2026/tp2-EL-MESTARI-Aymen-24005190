@@ -1,11 +1,15 @@
 package fr.univ_amu.iut.exercice6;
 
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 /**
@@ -43,52 +47,96 @@ public class FormulaireConnexion extends Application {
 
   @Override
   public void start(Stage primaryStage) {
-    // TODO exercice 6 : construire le formulaire et créer les bindings.
-    //
-    // 1. Créer un GridPane avec padding 20, hgap 10, vgap 10.
-    //
-    // 2. Ajouter les composants :
-    //    (0,0) Label "Identifiant :"   (1,0) TextField userId (id: "user-id")
-    //    (0,1) Label "Mot de passe :"  (1,1) PasswordField pwd (id: "pwd")
-    //    (0,2) Button okBtn "OK" (id: "btn-ok")
-    //    (1,2) Button cancelBtn "Annuler" (id: "btn-cancel")
-    //    (0,3) Label message (id: "message", colspan 2)
-    //
-    // 3. Appeler createBindings().
-    //
-    // 4. Ajouter les handlers okClicked() et cancelClicked().
-    //
-    // 5. Créer la Scene, l'attacher au Stage, afficher.
+    // 1. Créer un GridPane avec padding 20, hgap 10, vgap 10
+    GridPane grille = new GridPane();
+    grille.setPadding(new Insets(20));
+    grille.setHgap(10);
+    grille.setVgap(10);
+
+    // 2. Initialisation et configuration des composants avec leurs IDs
+    userId = new TextField();
+    userId.setId("user-id");
+
+    pwd = new PasswordField();
+    pwd.setId("pwd");
+
+    okBtn = new Button("OK");
+    okBtn.setId("btn-ok");
+
+    cancelBtn = new Button("Annuler");
+    cancelBtn.setId("btn-cancel");
+
+    message = new Label("");
+    message.setId("message");
+
+    // Placement dans la grille (colonne, ligne)
+    grille.add(new Label("Identifiant :"), 0, 0);
+    grille.add(userId, 1, 0);
+    grille.add(new Label("Mot de passe :"), 0, 1);
+    grille.add(pwd, 1, 1);
+    grille.add(okBtn, 0, 2);
+    grille.add(cancelBtn, 1, 2);
+    grille.add(message, 0, 3, 2, 1); // colspan 2
+
+    // 3. Appeler createBindings()
+    createBindings();
+
+    // 4. Ajouter les handlers d'événements
+    okBtn.setOnAction(e -> okClicked());
+    cancelBtn.setOnAction(e -> cancelClicked());
+
+    // 5. Créer la Scene, l'attacher au Stage, afficher
+    Scene scene = new Scene(grille);
+    primaryStage.setTitle("Formulaire de Connexion");
+    primaryStage.setScene(scene);
+    primaryStage.show();
   }
 
   /** Crée les bindings de validation. */
   void createBindings() {
-    // TODO exercice 6 : créer les bindings de validation.
-    //
-    // 1. Le mot de passe n'est éditable que si userId >= 6 caractères :
-    //    pwd.editableProperty().bind(
-    //        Bindings.greaterThanOrEqual(userId.textProperty().length(), 6))
-    //
-    // 2. Le bouton Annuler est désactivé si les deux champs sont vides :
-    //    cancelBtn.disableProperty().bind(
-    //        Bindings.and(
-    //            Bindings.equal(0, pwd.textProperty().length()),
-    //            Bindings.equal(0, userId.textProperty().length())))
-    //
-    // 3. Le bouton OK est désactivé par un BooleanBinding personnalisé :
-    //    Créer une classe anonyme new BooleanBinding() { ... }
-    //    - dans le bloc d'initialisation : super.bind(pwd.textProperty())
-    //    - dans computeValue() : retourner true si le mot de passe est
-    //      trop court (< 8) OU ne contient pas de majuscule OU pas de chiffre
-    //    okBtn.disableProperty().bind(binding)
+    // 1. Le mot de passe n'est éditable que si userId >= 6 caractères
+    pwd.editableProperty().bind(Bindings.greaterThanOrEqual(userId.textProperty().length(), 6));
+
+    // 2. Le bouton Annuler est désactivé si les deux champs sont vides
+    cancelBtn
+        .disableProperty()
+        .bind(
+            Bindings.and(
+                Bindings.equal(0, pwd.textProperty().length()),
+                Bindings.equal(0, userId.textProperty().length())));
+
+    // 3. Le bouton OK est désactivé par un BooleanBinding personnalisé de bas niveau
+    BooleanBinding formValide =
+        new BooleanBinding() {
+          {
+            super.bind(userId.textProperty(), pwd.textProperty());
+          }
+
+          @Override
+          protected boolean computeValue() {
+            String p = pwd.getText();
+            return userId.getText().length() >= 6
+                && p.length() >= 8
+                && p.chars().anyMatch(Character::isUpperCase)
+                && p.chars().anyMatch(Character::isDigit);
+          }
+        };
+
+    // Le bouton OK est désactivé si le formulaire n'est PAS valide
+    okBtn.disableProperty().bind(formValide.not());
   }
 
   void okClicked() {
-    // TODO exercice 6 : afficher l'identifiant et le mot de passe masqué.
+    // Affiche l'identifiant et le mot de passe masqué par des étoiles (*)
+    int pLength = pwd.getText().length();
+    message.setText("Bienvenue " + userId.getText() + " (" + "*".repeat(pLength) + ")");
   }
 
   void cancelClicked() {
-    // TODO exercice 6 : vider les deux champs et le label message.
+    // Vider les deux champs et effacer le label de statut
+    userId.clear();
+    pwd.clear();
+    message.setText("");
   }
 
   public static void main(String[] args) {
